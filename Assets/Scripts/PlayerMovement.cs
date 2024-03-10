@@ -16,6 +16,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool isWalking;
 
+    private bool justJumped = false;
+
     void Update()
     {
         // Check if the player is grounded
@@ -39,12 +41,12 @@ public class PlayerMovement : MonoBehaviour
             if (horizontalInput < 0)
             {
                 // Flip the sprite by scaling it negatively in the x-axis
-                transform.localScale = new Vector3(-1, 1, 1);
+                transform.localScale = new Vector3(-0.4f, 0.4f, 1);
             }
             else if (horizontalInput > 0)
             {
                 // Reset the sprite scale if moving right
-                transform.localScale = new Vector3(1, 1, 1);
+                transform.localScale = new Vector3(0.4f, 0.4f, 1);
             }
         }
         else
@@ -58,16 +60,19 @@ public class PlayerMovement : MonoBehaviour
         transform.position = newPosition;
 
         // Jumping
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !justJumped)
         {
-            Debug.Log("Jump");
-            newPosition.y += jumpForce * Time.deltaTime;
+            Debug.Log("Jump");      
             animator.SetBool("isJumping", true);
+            newPosition.y += jumpForce * Time.deltaTime;
+            justJumped = true;
+            
         }
-        if (isGrounded)
+        if (isGrounded && justJumped)
         {
             Debug.Log("Grounded");
             animator.SetBool("isJumping", false);
+            justJumped = false;
         }
         if (!isGrounded)
         {

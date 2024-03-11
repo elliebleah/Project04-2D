@@ -4,80 +4,57 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float moveSpeed = 5f; // Regular movement speed
-    public float runSpeed = 10f; // Running speed
+    public float moveSpeed = 5f; // Movement speed
     public float jumpForce = 10f; // Jump force
     public Transform groundCheck; // Ground check object
+    public float groundCheckRadius = 0.1f; // Radius for ground check
     public LayerMask groundLayer; // Layer for the ground objects
     public Animator animator; // Animator component
+    public float scaleMultiplier = 0.4f; // Scale multiplier for x-axis
 
+    private CharacterController controller;
     private bool isGrounded;
-    private bool isRunning;
+    private Vector3 velocity;
 
-    private bool isWalking;
-
-    private bool justJumped = false;
+    void Start()
+    {
+        controller = GetComponent<CharacterController>();
+    }
 
     void Update()
     {
         // Check if the player is grounded
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.1f, groundLayer);
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
 
         // Movement
         float horizontalInput = Input.GetAxisRaw("Horizontal");
-        Vector3 newPosition = transform.position;
-
-        // Handle horizontal movement
-        if (horizontalInput != 0)
-        {
-            // Play walk or run animation
-            animator.SetBool("isRunning", Input.GetKey(KeyCode.LeftShift));
-            animator.SetBool("isWalking", true);
-            // Set movement speed based on whether running or walking
-            float currentSpeed = Input.GetKey(KeyCode.LeftShift) ? runSpeed : moveSpeed;
-            newPosition += new Vector3(horizontalInput * currentSpeed * Time.deltaTime, 0, 0);
-
-            // Flip the character sprite if moving left
-            if (horizontalInput < 0)
-            {
-                // Flip the sprite by scaling it negatively in the x-axis
-                transform.localScale = new Vector3(-0.4f, 0.4f, 1);
-            }
-            else if (horizontalInput > 0)
-            {
-                // Reset the sprite scale if moving right
-                transform.localScale = new Vector3(0.4f, 0.4f, 1);
-            }
-        }
-        else
-        {
-            // Idle state
-            animator.SetBool("isWalking", false);
-            animator.SetBool("isRunning", false);
-        }
-
-        // Update player position
-        transform.position = newPosition;
+        velocity.x = horizontalInput * moveSpeed;
 
         // Jumping
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !justJumped)
-        {
-            Debug.Log("Jump");      
-            animator.SetBool("isJumping", true);
-            newPosition.y += jumpForce * Time.deltaTime;
-            justJumped = true;
-            
-        }
-        if (isGrounded && justJumped)
+        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("Grounded");
-            animator.SetBool("isJumping", false);
-            justJumped = false;
+            velocity.y = jumpForce;
         }
-        if (!isGrounded)
+
+        // Apply gravity
+        velocity.y += Physics2D.gravity.y * Time.deltaTime;
+
+        // Move the player
+        controller.Move(velocity * Time.deltaTime);
+
+        // Flip the character sprite if moving left
+        if (horizontalInput < 0)
         {
-            Debug.Log("Not Grounded");
-            //animator.SetBool("isJumping", false);
+            transform.localScale = Vector3.Scale(transform.localScale, new Vector3(-scaleMultiplier, 1, 1));
         }
+        else if (horizontalInput > 0)
+        {
+            transform.localScale = Vector3.Scale(transform.localScale, new Vector3(scaleMultiplier, 1, 1));
+        }
+
+        // Update animator parameters
+        //animator.SetFloat("Speed", Mathf.Abs(horizontalInput));
+        //animator.SetBool("isGrounded", isGrounded);
     }
 }

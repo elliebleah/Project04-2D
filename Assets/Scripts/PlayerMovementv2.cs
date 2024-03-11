@@ -39,12 +39,14 @@ public class PlayerMovementv2 : MonoBehaviour
     {
         dirX = Input.GetAxisRaw("Horizontal") * runState;
         rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
-        if (Input.GetKeyDown(KeyCode.LeftShift))
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            runState = runSpeed;
+            Debug.Log("Left Shift down");
+            runState = (runSpeed / moveSpeed);
         }
-        if (!Input.GetKeyDown(KeyCode.LeftShift))
+        if (!Input.GetKey(KeyCode.LeftShift))
         {
+            Debug.Log("Not Left Shift");
             runState = 1f;
         }
     

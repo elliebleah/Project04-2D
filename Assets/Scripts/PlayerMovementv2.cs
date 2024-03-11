@@ -17,6 +17,8 @@ public class PlayerMovementv2 : MonoBehaviour
     [SerializeField] private float runSpeed = 10f;
     [SerializeField] private float jumpForce = 14f;
 
+    [SerializeField] private float runState = 1f;
+
     [SerializeField] MovementState state;
 
     private enum MovementState { idle, walking, running, jumping, falling }
@@ -35,17 +37,17 @@ public class PlayerMovementv2 : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        dirX = Input.GetAxisRaw("Horizontal");
-
-        if (state == MovementState.walking)
+        dirX = Input.GetAxisRaw("Horizontal") * runState;
+        rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
+        if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            rb.velocity = new Vector2(dirX * moveSpeed, rb.velocity.y);
+            runState = runSpeed;
         }
-        if (state == MovementState.running)
+        if (!Input.GetKeyDown(KeyCode.LeftShift))
         {
-            rb.velocity = new Vector2(dirX * runSpeed, rb.velocity.y);
+            runState = 1f;
         }
-        
+    
 
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
         {
@@ -63,10 +65,7 @@ public class PlayerMovementv2 : MonoBehaviour
         if (dirX > 0f)
         {
             state = MovementState.walking;
-            if (Input.GetKeyDown(KeyCode.LeftShift))
-            {
-                state = MovementState.running;
-            }
+            
             
             sprite.flipX = false;
         }

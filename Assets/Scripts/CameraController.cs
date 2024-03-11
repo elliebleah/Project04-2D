@@ -8,6 +8,7 @@ public class CameraController : MonoBehaviour
     public Transform background;
 
     private Vector3 offset; // Offset between camera and player
+    [SerializeField] private float yOffset = 1.5f;
 
     void Start()
     {
@@ -23,7 +24,7 @@ public class CameraController : MonoBehaviour
             return;
         }
 
-        offset = transform.position - player.position;
+        offset = transform.position - player.position + new Vector3(0, yOffset, 0);
     }
 
     void Update()
@@ -34,7 +35,7 @@ public class CameraController : MonoBehaviour
             transform.position = player.position + offset;
             
             // Update background position to follow camera
-            background.position = transform.position;
+            background.position = new Vector3(transform.position.x, transform.position.y, 0f);
         }
     }
 }

@@ -28,7 +28,10 @@ public class PlayerMovement : MonoBehaviour
 
         // Movement
         float horizontalInput = Input.GetAxisRaw("Horizontal");
-        velocity.x = horizontalInput * moveSpeed;
+        float targetVelocityX = horizontalInput * moveSpeed;
+        
+        // Apply friction or damping to gradually slow down the player's velocity
+        velocity.x = Mathf.Lerp(velocity.x, targetVelocityX, 0.1f);
 
         // Jumping
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
@@ -52,9 +55,5 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.localScale = Vector3.Scale(transform.localScale, new Vector3(scaleMultiplier, 1, 1));
         }
-
-        // Update animator parameters
-        //animator.SetFloat("Speed", Mathf.Abs(horizontalInput));
-        //animator.SetBool("isGrounded", isGrounded);
     }
 }
